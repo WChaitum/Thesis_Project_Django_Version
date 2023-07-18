@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  {% block title %}
+  {% endblock %}
+</head>
+<style>
+  nav{
+    z-index: 9999;
+  }
+  .alert-container {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    z-index: 1;
+  }
+  .row{
+    display: flex;
+    margin-top: 8rem;
+    text-align: center;
+    align-items: center;
+    justify-content:space-around;
+  }
+</style>
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-dark navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              {% block Home %}
+                <a class="nav-link" href="/">Home</a>
+              {% endblock %}
+            </li>
+            <li class="nav-item">
+              {% block member %}
+                <a class="nav-link" href="/member">Member</a>
+              {% endblock %}
+            </li>
+            <li class="nav-item">
+              {% block About %}
+                <a class="nav-link" href="/about">About</a>
+              {% endblock %}
+            </li>
+            <li class="nav-item">
+              {% block Form %}
+                <a class="nav-link" href="/form">Form</a>
+              {% endblock %}
+            </li>
+            <li class="nav-item">
+              {% block admin %}
+                <a class="nav-link" href="/admin" onclick="return confirm('คุณต้องการเข้าระบบ Admin หรือไม่?')">Admin</a>
+              {% endblock %}
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container mt-5 ">
+    {% block content %}
+    {% endblock%}
+  </div>
+
+
+  <div class="alert-container">
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        <div class="alert alert-success" role="alert">
+          <i class="bi bi-check-circle-fill"></i>
+          <strong>{{ message }}</strong>
+        </div>
+      {% else %}
+        <div class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <strong>{{ message }}</strong>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+</html>
