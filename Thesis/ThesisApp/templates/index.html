@@ -7,91 +7,115 @@
 {% block Home %}
     <a class="nav-link active" aria-current="page" href="/">Home</a>
 {% endblock %}
-
 {% block content %}
-
 <script>
+  // Function to speak the given text using Web Speech API
   function speak(text, personId, repeatCount) {
-      if ('speechSynthesis' in window) {
-          var utterance = new SpeechSynthesisUtterance(text);
-          utterance.voiceURI = 'native';
-          utterance.lang = 'th-TH';
-          speechSynthesis.speak(utterance);
-          utterance.onend = function() {
-              // เมื่อการเล่นเสียงสิ้นสุดลง จะส่งคำร้องขอ AJAX เพื่ออัปเดตสถานะเป็น "Called"
-              var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-              var xhr = new XMLHttpRequest();
-              xhr.open('POST', '/' + personId + '/', true);
-              xhr.setRequestHeader('Content-Type', 'application/json');
-              xhr.setRequestHeader('X-CSRFToken', csrfToken);
-              xhr.onreadystatechange = function() {
-                  if (xhr.readyState === 4 && xhr.status === 200) {
-                      console.log('Status updated successfully.');
-                      if (repeatCount === 3) {
-                          // เมื่อมีการเล่นเสียงครบ 3 ครั้งและอัปเดตสถานะเรียบร้อยแล้ว จะเปลี่ยนเส้นทาง (redirect) ไปยัง URL ที่กำหนด
-                          window.location.href = '/';
-                      }
-                  }
-              };
-              xhr.send(JSON.stringify({ status: 'Called' }));
-          };
-      } else {
-          console.log('Web Speech API is not supported.');
-      }
-  }
-  
-  function playSpeechAutomatically() {
-      // ดึงข้อมูลของผู้ปกครองจากตัวแปร Datatext
-      var Datatext = '{{ all_person.children_name }}';
-      // สร้างข้อความที่ต้องการพูดโดยรวมกับคำว่า "ผู้ปกครองมารับแล้ว"
-      var text = Datatext + 'ผู้ปกครองมารับแล้ว';
-      // กำหนดจำนวนครั้งในการเล่นเสียง
-      var repeatCount = 3;
-      if (Datatext !== '') {
-          // วนลูปเพื่อเล่นเสียงตามจำนวนที่กำหนด
-          for (var i = 0; i < repeatCount; i++) {
-              // ตั้งเวลาในการเล่นเสียงในลำดับที่และกำหนดจำนวนครั้งที่ต้องการให้เล่น
-              setTimeout(speak.bind(null, text, '{{ all_person.id }}', i + 1), i * 1000);
+    if ('speechSynthesis' in window) {
+      // Create a SpeechSynthesisUtterance object with the provided text
+      var utterance = new SpeechSynthesisUtterance(text);
+      // Find the voice for the 'th-TH' (Thai) language
+      utterance.voice = speechSynthesis.getVoices().find((voice) => voice.lang === 'th-TH');
+      // Speak the text
+      speechSynthesis.speak(utterance);
+      // When the speech is done, send an AJAX request to update the status to "Called"
+      utterance.onend = function () {
+        var csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/' + personId + '/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+        xhr.onreadystatechange = function () {
+          // If the AJAX request is successful and the status has been updated
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            console.log('Status updated successfully.');
+            // If the sound has been played 3 times and the status has been updated successfully, redirect to the home page
+            if (repeatCount === 3) {
+              window.location.href = '/';
+            }
           }
-      }
+        };
+        // Send the AJAX request with JSON data containing the status "Called"
+        xhr.send(JSON.stringify({ status: 'Called' }));
+      };
+    } else {
+      console.log('Web Speech API is not supported.');
+    }
   }
-  
-  playSpeechAutomatically();
-  
-  </script>
 
+  // Function to automatically play the speech for the provided data
+  function playSpeechAutomatically() {
+    // Get the data of the children from the Datatext variable
+    var Datatext = '{{ all_person.children_name }}';
+    // Create the text to be spoken along with "ผู้ปกครองมารับแล้ว"
+    var text = Datatext + 'ผู้ปกครองมารับแล้ว';
+    // Set the number of times the speech will be played
+    var repeatCount = 3;
+    if (Datatext !== '') {
+      // Loop to play the speech as many times as specified
+      for (var i = 0; i < repeatCount; i++) {
+        // Set the timeout for playing the speech with the order and the number of times to play
+        setTimeout(speak.bind(null, text, '{{ all_person.id }}', i + 1), i * 1000);
+      }
+    }
+  }
+
+  // Wait for the page to load, then call the function to play the speech automatically
+  window.addEventListener('load', playSpeechAutomatically);
+</script>
 
 <div class="Show">
-  <div class="row">
+  <div class="row justify-content-between">
     <!-- ส่วนซ้าย -->
-    <div class=" card col-5 pt-3">
-      <img src="https://hips.hearstapps.com/hmg-prod/images/rick-and-morty-image-1662104014.jpg?crop=0.316xw:0.562xh;0.352xw,0.168xh&resize=980:*" class="card-img-top" alt="...">
-      <div class="card-body">
-        <h1>{{ all_person.Parent_name }}</h1>
+    {% if all_person %}
+      <div class="card col-5 pt-3">
+        <!-- Show the image of the parent -->
+        <img src="{{ all_person.Parent_image.url }}" class="img-fluid w-100" style="height: 35rem;" alt="...">
+        <div class="card-body">
+          <!-- Show the name of the parent -->
+          <h1>{{ all_person.Parent_name }}</h1>
+        </div>
       </div>
-    </div>
+    {% endif %}
     <!-- ส่วนขวา -->
-    <div class="card col-5 pt-3">
-      <img src="https://pbs.twimg.com/profile_images/1243449047710609409/yjZxgR40_400x400.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <h1>{{ all_person.children_name }}</h1>
+    {% if all_person %}
+      <div class="card col-5 pt-3">
+        <!-- Show the image of the child -->
+        <img src="{{ all_person.children_image.url }}" class="img-fluid w-100" style="height: 35rem;" alt="...">
+        <div class="card-body">
+          <!-- Show the name of the child -->
+          <h1>{{ all_person.children_name }}</h1>
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
-  
-  <div class="row mt-3">
-    <!-- ส่วนล่าง -->
-    <div class="card col-12">
-      <h3>กรุณากรอกหมายเลขผู้ปกครองของท่าน</h3>
+  {% if all_person %}
+    <div class="row mt-3 justify-content-center">
+      <!-- ส่วนล่าง -->
+      <div class="card col-6 align-items-center">
+        <h3 class="text-center">กรุณากรอกหมายเลขผู้ปกครองของท่าน</h3>
         <form method="POST" action="" class="input-group mb-3">
           {% csrf_token %}
           <input type="text" name="search_keyword" class="form-control">
-          <input type="submit" class="btn btn-success" value="Search" >
+          <input type="submit" class="btn btn-success" value="Search">
         </form>
+      </div>
+    </div>  
+  {% else %}
+    <div class="d-flex justify-content-center mt-5">
+      <!-- ส่วนล่าง -->
+      <div class="card col-6 align-items-center">
+        <h3 class="text-center">กรุณากรอกหมายเลขผู้ปกครองของท่าน</h3>
+        <form method="POST" action="" class="input-group mb-3">
+          {% csrf_token %}
+          <input type="text" name="search_keyword" class="form-control">
+          <input type="submit" class="btn btn-success" value="Search">
+        </form>
+      </div>
     </div>
-  </div>
+    
+  {% endif %}
 </div>
-
 
 <style>
   .input-group {

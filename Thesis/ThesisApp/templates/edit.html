@@ -8,7 +8,7 @@
 {% block content %}
 <h2 class="text-center">แบบฟอร์มแก้ไข</h2>
 
-<form action="" method="post">
+<form action="" method="post"enctype="multipart/form-data">
     {% csrf_token %}
     <div class="d-flex mb-3">
         <div class="flex-grow-1 me-3">
@@ -20,10 +20,10 @@
         </div>
         <div>
             <label for="Parent_Key" class="form-label">Parent's Key</label>
-            <input type="text" name="Parent_Key" class="form-control" id="Parent_Key"min="1" value="{{person.Parent_key}}"/>
+            <input type="text" name="Parent_Key" class="form-control " id="Parent_Key"min="1" value="{{person.Parent_key}}"/>
         </div>
     </div>
-    <div class="d-flex mb-3">
+    <div class="d-flex mb-3 col-12">
         <div class="flex-grow-1 me-3">
             <label for="Children_Name" class="form-label">Children's Name</label>
             <input type="text" name="Children_Name" class="form-control" id="Children_Name" aria-describedby="Children_NameHelp" value="{{person.children_name}}" />
@@ -32,9 +32,26 @@
             </div>
         </div>
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="mb-3" style="height: 20rem;">
+        {% if person.children_image %}
+         <div class="d-flex mb-3 col-12"style="height: 100%;">
+            <div class="col-6 me-3">
+                <label for="Parent_File" class="form-label">Parent's Image</label>
+                <input class="form-control col-6" type="file" name="Parent_File" id="Parent_File" value="{{ person.Parent_image.url }}">
+                <img src="{{ person.Parent_image.url }}" alt="Parent's Image" style="max-width: 100% ;height:75%; margin-top: 10px;">
+            </div>
+            <div class="col-6 me-3">
+                <label for="Children_File" class="form-label">Children's Image</label>
+                <input class="form-control col-6" type="file" name="Children_File" id="Children_File " value="{{ person.children_image.url }}">
+                <img src="{{ person.children_image.url }}" alt="Children's Image" style="max-width: 100% ;height:75%; margin-top: 10px;">
+            </div>
+        </div>
+        {% else %}
+            <p>No image uploaded</p>
+        {% endif %}
+    </div>
+    <div class="center-btn d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
 </form>
-
-
-
 {% endblock%}

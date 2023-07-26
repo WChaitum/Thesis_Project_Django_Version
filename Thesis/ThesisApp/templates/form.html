@@ -11,19 +11,23 @@
 {% block content %}
 <h2 class="text-center">แบบฟอร์มสมัครสมาชิก</h2>
 
-    <form action="form" method="post">
+    <form action="/form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="d-flex mb-3">
-            <div class="flex-grow-1 me-3">
+            <div class="flex-grow-1 me-3 ">
                 <label for="Parent_Name" class="form-label">Parent's Name</label>
                 <input type="text" name="Parent_Name" class="form-control" id="Parent_Name" aria-describedby="Parent_NameHelp" placeholder="" />
                 <div id="Parent_NameHelp" class="form-text">
                     Please enter your full name.
                 </div>
             </div>
-            <div>
-                <label for="Parent_Key" class="form-label">Parent's Key</label>
+            <div class="me-3">
+                <label for="Parent_Key" class="form-label ">Parent's Key</label>
                 <input type="text" name="Parent_Key" class="form-control" id="Parent_Key"min="1"/>
+            </div>
+            <div>
+                <label for="formFile" class="form-label">Parent's Imgae</label>
+                <input class="form-control" type="file" name="Parent_File" id="Parent_File">
             </div>
         </div>
         <div class="d-flex mb-3">
@@ -34,7 +38,13 @@
                     Please enter your full name.
                 </div>
             </div>
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Children's Imgae</label>
+                <input class="form-control" type="file" name="Children_File" id="Children_File">
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="center-btn d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </form>
 {% endblock%}
